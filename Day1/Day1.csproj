@@ -7,5 +7,9 @@
         <Nullable>enable</Nullable>
         <RootNamespace>AdventOfCode2024</RootNamespace>
     </PropertyGroup>
-
+  <ItemGroup>
+    <Content Include="input*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>    
 </Project>
