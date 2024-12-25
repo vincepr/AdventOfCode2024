@@ -1,7 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
-
-var input = File.ReadAllLines("./input");
+﻿var input = File.ReadAllLines("./input");
 List<(int, int)> rules = [];
 List<List<int>> lists = [];
 foreach (var str in input)
@@ -23,7 +20,32 @@ foreach (var str in input)
 }
 
 List<int> successMiddles = [];
+List<int> recoveredMiddles = [];
 foreach (var list in lists)
+{
+    bool isTrue = IsAllRulesCorrect(rules, list);
+    if (isTrue)
+    {
+        // success
+        System.Console.WriteLine(string.Join(",", list));
+        System.Console.WriteLine($"Added {list[list.Count / 2]}");
+        successMiddles.Add(list[list.Count / 2]);
+    }
+    else
+    {
+        // part 2 recovery
+        System.Console.WriteLine("Before swap: " + string.Join(",", list));
+        SwapTillRight(list, rules);
+        System.Console.WriteLine("After swap : " + string.Join(",", list));
+        System.Console.WriteLine($"Added recovered: {list[list.Count / 2]}");
+        recoveredMiddles.Add(list[list.Count / 2]);
+    }
+}
+
+System.Console.WriteLine($"SumMiddles: {successMiddles.Sum()}");
+System.Console.WriteLine($"SumRecoveredMiddles: {recoveredMiddles.Sum()}");
+
+static bool IsAllRulesCorrect(List<(int, int)> rules, List<int> list)
 {
     var isTrue = true;
     foreach (var rule in rules)
@@ -32,16 +54,38 @@ foreach (var list in lists)
         var idx2 = list.FindIndex(itm => itm == rule.Item2);
         if (idx1 != -1 && idx2 != -1)
         {
-            if (idx1 > idx2){
+            if (idx1 > idx2)
+            {
                 isTrue = false;
             }
         }
     }
-    if (isTrue)
+
+    return isTrue;
+}
+
+void SwapTillRight(List<int> list, List<(int, int)> rules)
+{
+    if (IsAllRulesCorrect(rules, list))
     {
-        System.Console.WriteLine(string.Join(",", list));
-        System.Console.WriteLine($"Added {list[list.Count / 2]}");
-        successMiddles.Add(list[list.Count / 2]);
+        return;
+    }
+    SwapFirstWrongElements(rules, list);
+    SwapTillRight(list, rules);
+}
+
+void SwapFirstWrongElements(List<(int, int)> rules, List<int> list)
+{
+    foreach (var rule in rules)
+    {
+        var idx1 = list.FindIndex(itm => itm == rule.Item1);
+        var idx2 = list.FindIndex(itm => itm == rule.Item2);
+        if (idx1 != -1 && idx2 != -1)
+        {
+            if (idx1 > idx2)
+            {
+                (list[idx1], list[idx2]) = (list[idx2], list[idx1]);
+            }
+        }
     }
 }
-System.Console.WriteLine($"SumMiddles: {successMiddles.Sum()}");
